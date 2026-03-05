@@ -23,7 +23,7 @@ class VLLMServerManager:
         Parameters
         ----------
         model_id : str
-            HuggingFace model identifier (e.g. ``"meta-llama/Llama-2-7b-hf"``).
+            HuggingFace model identifier
         port : int
             Port number the server will listen on.
         """
@@ -47,7 +47,7 @@ class VLLMServerManager:
         )
 
     def wait_for_health(self, timeout: int = 120) -> None:
-        """Poll the ``/health`` endpoint until a 200 OK is received.
+        """Poll the /health endpoint until a 200 OK is received.
 
         Parameters
         ----------
@@ -57,7 +57,7 @@ class VLLMServerManager:
         Raises
         ------
         VLLMServerHealthTimeout
-            If the server does not respond with 200 within *timeout* seconds.
+            If the server does not respond with 200 within timeout seconds.
         """
         if self._port is None:
             raise RuntimeError("Server has not been started yet.")
@@ -109,7 +109,7 @@ class VLLMServerManager:
 
     @staticmethod
     def _free_vram() -> None:
-        """Release VRAM via ``torch.cuda.empty_cache()`` and run garbage collection."""
+        """Release VRAM via torch.cuda.empty_cache() and run garbage collection."""
         gc.collect()
         try:
             import torch
