@@ -7,3 +7,6 @@ __pycache__/
 
 # VSCode settings
 .vscode/
+
+# Quantized checkpoints (multi-GB, reproducible from Quantizer)
+quantized_models/
