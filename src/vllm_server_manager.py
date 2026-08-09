@@ -40,11 +40,9 @@ class VLLMServerManager:
             "--port",
             str(port),
         ]
-        self._process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
+        # Streams are inherited, not piped: nothing here reads them, and vLLM's
+        # startup logs would fill the ~64KB pipe buffer and deadlock the server.
+        self._process = subprocess.Popen(cmd)
 
     def wait_for_health(self, timeout: int = 120) -> None:
         """Poll the /health endpoint until a 200 OK is received.
