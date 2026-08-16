@@ -29,10 +29,10 @@ The intended workflow is:
 
 ```mermaid
 flowchart LR
-    DS["Your Dataset\n(real requests)"]
+    DS["Your Dataset (real requests)"]
 
-    DS --> BM["Base Model\n(float16)"]
-    DS --> QM["Quantized Model\n(W4A16, W8A8, ...)"]
+    DS --> BM["Base Model (float16)"]
+    DS --> QM["Quantized Model (W4A16, W8A8, ...)"]
 
     BM --> BS["Outputs + Scores"]
     QM --> QS["Outputs + Scores"]
@@ -45,7 +45,8 @@ flowchart LR
 
 ## Repo Layout
 
-\src/
+```
+src/
   quantizer.py            # Quantize HuggingFace models into cached, vLLM-servable checkpoints
   vllm_server_manager.py  # Start, health-check, and terminate a vLLM server subprocess
 
@@ -55,12 +56,13 @@ tests/
 
 notebooks/
   colab_test_drive.ipynb  # End-to-end walkthrough for Colab / GPU environments
-\
+```
+
 ---
 
 ## Current Components
 
-### \Quantizer\ (\src/quantizer.py\)
+### `Quantizer` (`src/quantizer.py`)
 
 Produces quantized, vLLM-servable checkpoints from any HuggingFace model. Output is written in compressed-tensors format; vLLM auto-detects the quantization config, so no extra flags are needed at serve time.
 
@@ -68,14 +70,14 @@ Produces quantized, vLLM-servable checkpoints from any HuggingFace model. Output
 
 | Scheme | Method | Calibration data required |
 |---|---|---|
-| \W4A16\ | GPTQ | Yes |
-| \W8A8_INT8\ | SmoothQuant + GPTQ | Yes |
-| \AWQ_W4A16\ | AWQ + W4A16 asymmetric | Yes |
-| \FP8_BLOCK\ | Round-to-nearest FP8 | No |
+| `W4A16`     | GPTQ                  | Yes |
+| `W8A8_INT8` | SmoothQuant + GPTQ      | Yes |
+| `AWQ_W4A16` | AWQ + W4A16 asymmetric | Yes |
+| `FP8_BLOCK`  | Round-to-nearest FP8 | No  |
 
 Checkpoints are cached on disk (keyed by model, scheme, and calibration config), so repeated runs skip quantization. A crash mid-save never leaves a poisoned cache entry.
 
-### \VLLMServerManager\ (\src/vllm_server_manager.py\)
+### `VLLMServerManager` (`src/vllm_server_manager.py`)
 
 Manages a vLLM OpenAI-compatible API server as a background subprocess. Handles startup, health polling, graceful shutdown, and GPU memory cleanup.
 
@@ -93,15 +95,16 @@ Manages a vLLM OpenAI-compatible API server as a background subprocess. Handles 
 
 Unit tests run without a GPU or ML stack:
 
-\\ash
+```bash
 python -m pytest tests/
-\
+```
+
 Integration tests require a GPU and the full ML stack:
 
-\\ash
+```bash
 # Quantization integration test (requires llm-compressor + GPU)
 TEST_QUANT_INTEGRATION=1 python -m pytest tests/test_quantizer.py
 
 # vLLM server integration test (requires vLLM + GPU)
 TEST_VLLM_INTEGRATION=1 python -m pytest tests/test_vllm_server_manager.py
-\
+```
